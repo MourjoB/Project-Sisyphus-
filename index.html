@@ -288,7 +288,20 @@
                 const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
 
                 doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                doc.save('invoice.pdf');
+
+                // Create a Blob for the PDF file
+                const pdfBlob = doc.output('blob');
+                const blobURL = URL.createObjectURL(pdfBlob);
+
+                // Create a temporary link for downloading
+                const link = document.createElement('a');
+                link.href = blobURL;
+                link.download = 'invoice.pdf';
+                link.style.display = 'none';
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
         }
 
