@@ -281,13 +281,27 @@
             const invoiceContainer = document.getElementById('invoice-container');
             const { jsPDF } = window.jspdf;
 
-            html2canvas(invoiceContainer).then(canvas => {
+            html2canvas(invoiceContainer, { scale: 2 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const doc = new jsPDF();
-                const imgWidth = 190; // Fit image to page width
-                const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4' // Set page size to A4
+                });
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const imgWidth = pageWidth - 20; // Leave margins
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
                 doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+
+                // Handle multi-page content
+                if (imgHeight > pageHeight - 20) {
+                    const remainingHeight = imgHeight - (pageHeight - 20);
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 10, -remainingHeight, imgWidth, imgHeight);
+                }
 
                 // Create a Blob for the PDF file
                 const pdfBlob = doc.output('blob');

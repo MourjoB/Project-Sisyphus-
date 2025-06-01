@@ -58,13 +58,15 @@ button:hover {
 }
 
 #invoice-container {
-    margin-top: 20px;
+    width: 100%;
+    max-width: 800px; /* Limit the width for better rendering */
+    margin: 0 auto; /* Center the container */
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-family: 'Roboto', Arial, sans-serif;
-    overflow-x: auto;
+    overflow-x: auto; /* Prevent content from being cut off */
 }
 
 #invoice-container h2 {
@@ -103,12 +105,16 @@ button:hover {
     margin-top: 20px;
 }
 
+#invoice-container th, #invoice-container td {
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9em; /* Adjust font size for smaller screens */
+}
+
 #invoice-container th {
     background-color: #007BFF;
     color: #fff;
     font-weight: bold;
-    padding: 10px;
-    border: 1px solid #ccc;
 }
 
 #invoice-container td {
