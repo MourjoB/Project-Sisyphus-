@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Instant Coffee (SD)",
+        "hsn": "0901",
+        "gstRate": 18,
+        "unit": "kg",
+        "price": 500
+    },
+    {
+        "name": "Instant Coffee (Agglo)",
+        "hsn": "0902",
+        "gstRate": 18,
+        "unit": "kg",
+        "price": 600
+    },
+    {
+        "name": "Instant Coffee (FD)",
+        "hsn": "0903",
+        "gstRate": 18,
+        "unit": "kg",
+        "price": 700
+    },
+    {
+        "name": "Coffee Premix",
+        "hsn": "2101",
+        "gstRate": 18,
+        "unit": "kg",
+        "price": 300
+    }
+]
