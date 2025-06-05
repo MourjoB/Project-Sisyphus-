@@ -59,7 +59,7 @@ button:hover {
 
 #invoice-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background-color: #fff;
@@ -102,13 +102,14 @@ button:hover {
 
 .invoice-table-wrapper {
     overflow-x: auto;
+    width: 100%;
 }
 
 #invoice-container table {
     width: 100%;
+    min-width: 950px;
     border-collapse: collapse;
     margin-top: 20px;
-    min-width: 900px;
 }
 
 #invoice-container th, #invoice-container td {
@@ -135,7 +136,7 @@ button:hover {
 
 #download-button {
     display: none;
-    margin: 20px auto;
+    margin-top: 20px;
     padding: 10px 20px;
     background-color: #007BFF;
     color: #fff;
@@ -146,27 +147,31 @@ button:hover {
     font-weight: bold;
 }
 
-/* 📱 Mobile Responsiveness */
+#download-button:hover {
+    background-color: #0056b3;
+}
+
+/* Force PC layout on mobile */
 @media (max-width: 600px) {
     html {
         font-size: 90%;
     }
 
-    #invoice-container h2 {
-        font-size: 1.3em;
+    #invoice-container {
+        padding: 10px;
+        overflow-x: auto;
     }
 
     #invoice-container .details {
-        flex-direction: column;
+        flex-direction: row;
     }
 
     #invoice-container .details div {
-        width: 100%;
+        width: 48%;
     }
 
     #invoice-container table {
-        display: block;
-        overflow-x: auto;
+        display: table;
         white-space: nowrap;
     }
 
@@ -175,7 +180,7 @@ button:hover {
         padding: 6px;
     }
 
-    form, #invoice-container {
+    form {
         padding: 10px;
     }
 
