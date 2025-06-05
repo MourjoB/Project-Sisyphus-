@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=1024">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024" />
   <title>Purple Bean Agro Invoice Generator</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
@@ -12,42 +12,111 @@
 </head>
 <body>
   <div class="container">
-    <img src="893e665f-85de-44ef-aeaf-99f25fa4fa4d.png" alt="Purple Bean Logo" style="max-width: 150px; display: block; margin: 0 auto;">
+    <!-- ======= Header ======= -->
+    <img
+      src="893e665f-85de-44ef-aeaf-99f25fa4fa4d.png"
+      alt="Purple Bean Logo"
+      style="max-width: 150px; display: block; margin: 0 auto;"
+    />
     <h1>Purple Bean Agro Industries Pvt. Ltd.</h1>
-    <p style="text-align: center; margin: 0;">PBAI Pvt Ltd, Nr. Dapodi Metro Station, Dapodi, Pune, Maharashtra 411012</p>
-    <p style="text-align: center; margin: 0;">Phone: 8101287339 | Email: purplebeanagro@gmail.com</p>
-    <p style="text-align: center; margin: 0;">GSTIN: 27AIPPD4664G1Z2 | PAN: AAPCP3820M</p>
+    <p style="text-align: center; margin: 0;">
+      PBAI Pvt Ltd, Nr. Dapodi Metro Station, Dapodi, Pune, Maharashtra 411012
+    </p>
+    <p style="text-align: center; margin: 0;">
+      Phone: 8101287339 | Email: purplebeanagro@gmail.com
+    </p>
+    <p style="text-align: center; margin: 0;">
+      GSTIN: 27AIPPD4664G1Z2 | PAN: AAPCP3820M
+    </p>
     <h2 style="text-align: center;">TAX INVOICE</h2>
 
+    <!-- ======= Invoice Form ======= -->
     <form onsubmit="generateInvoice(event)">
+      <!-- === Invoice Details === -->
       <fieldset>
         <legend>Invoice Details</legend>
-        <div class="form-group"><label for="invoice-number">Invoice Number:</label><input type="text" id="invoice-number" required></div>
-        <div class="form-group"><label for="invoice-date">Invoice Date:</label><input type="date" id="invoice-date" required></div>
-        <div class="form-group"><label for="vehicle-no">Vehicle Number (optional):</label><input type="text" id="vehicle-no"></div>
-        <div class="form-group"><label for="reverse-charge">Reverse Charge (optional):</label><input type="text" id="reverse-charge"></div>
-        <div class="form-group"><label for="challan-no">Challan Number (optional):</label><input type="text" id="challan-no"></div>
-        <div class="form-group"><label for="date-of-supply">Date of Supply (optional):</label><input type="date" id="date-of-supply"></div>
-        <div class="form-group"><label for="place-of-supply">Place of Supply (optional):</label><input type="text" id="place-of-supply"></div>
-        <div class="form-group"><label for="transporter-name">Transporter Name (optional):</label><input type="text" id="transporter-name"></div>
-        <div class="form-group"><label for="lr-number">LR Number (optional):</label><input type="text" id="lr-number"></div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Customer Details</legend>
-        <div class="form-group"><label for="customer-name">Customer Name:</label><input type="text" id="customer-name"></div>
-        <div class="form-group"><label for="customer-email">Customer Email:</label><input type="email" id="customer-email"></div>
-        <div class="form-group"><label for="customer-phone">Customer Phone:</label><input type="tel" id="customer-phone"></div>
-        <div class="form-group"><label for="billing-address">Billing Address:</label><input type="text" id="billing-address"></div>
-        <div class="form-group"><input type="checkbox" id="same-address" checked> <label for="same-address">Shipping same as Billing</label></div>
-        <div id="shipping-details" style="display: none;">
-          <div class="form-group"><label for="shipping-name">Shipping Name:</label><input type="text" id="shipping-name"></div>
-          <div class="form-group"><label for="shipping-email">Shipping Email:</label><input type="email" id="shipping-email"></div>
-          <div class="form-group"><label for="shipping-phone">Shipping Phone:</label><input type="tel" id="shipping-phone"></div>
-          <div class="form-group"><label for="shipping-address">Shipping Address:</label><input type="text" id="shipping-address"></div>
+        <div class="form-group">
+          <label for="invoice-number">Invoice Number:</label>
+          <input type="text" id="invoice-number" required />
+        </div>
+        <div class="form-group">
+          <label for="invoice-date">Invoice Date:</label>
+          <input type="date" id="invoice-date" required />
+        </div>
+        <div class="form-group">
+          <label for="vehicle-no">Vehicle Number (optional):</label>
+          <input type="text" id="vehicle-no" />
+        </div>
+        <div class="form-group">
+          <label for="reverse-charge">Reverse Charge (optional):</label>
+          <input type="text" id="reverse-charge" />
+        </div>
+        <div class="form-group">
+          <label for="challan-no">Challan Number (optional):</label>
+          <input type="text" id="challan-no" />
+        </div>
+        <div class="form-group">
+          <label for="date-of-supply">Date of Supply (optional):</label>
+          <input type="date" id="date-of-supply" />
+        </div>
+        <div class="form-group">
+          <label for="place-of-supply">Place of Supply (optional):</label>
+          <input type="text" id="place-of-supply" />
+        </div>
+        <div class="form-group">
+          <label for="transporter-name">Transporter Name (optional):</label>
+          <input type="text" id="transporter-name" />
+        </div>
+        <div class="form-group">
+          <label for="lr-number">LR Number (optional):</label>
+          <input type="text" id="lr-number" />
         </div>
       </fieldset>
 
+      <!-- === Customer Details === -->
+      <fieldset>
+        <legend>Customer Details</legend>
+        <div class="form-group">
+          <label for="customer-name">Customer Name:</label>
+          <input type="text" id="customer-name" />
+        </div>
+        <div class="form-group">
+          <label for="customer-email">Customer Email:</label>
+          <input type="email" id="customer-email" />
+        </div>
+        <div class="form-group">
+          <label for="customer-phone">Customer Phone:</label>
+          <input type="tel" id="customer-phone" />
+        </div>
+        <div class="form-group">
+          <label for="billing-address">Billing Address:</label>
+          <input type="text" id="billing-address" />
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="same-address" checked />
+          <label for="same-address">Shipping same as Billing</label>
+        </div>
+        <div id="shipping-details" style="display: none;">
+          <div class="form-group">
+            <label for="shipping-name">Shipping Name:</label>
+            <input type="text" id="shipping-name" />
+          </div>
+          <div class="form-group">
+            <label for="shipping-email">Shipping Email:</label>
+            <input type="email" id="shipping-email" />
+          </div>
+          <div class="form-group">
+            <label for="shipping-phone">Shipping Phone:</label>
+            <input type="tel" id="shipping-phone" />
+          </div>
+          <div class="form-group">
+            <label for="shipping-address">Shipping Address:</label>
+            <input type="text" id="shipping-address" />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- === Invoice Items === -->
       <fieldset>
         <legend>Invoice Items</legend>
         <div id="product-container">
@@ -58,83 +127,183 @@
                 <option value="" disabled selected>Select a product</option>
               </select>
             </div>
-            <div class="form-group"><label>Quantity:</label><input type="number" class="item-qty" required></div>
-            <div class="form-group"><label>Rate:</label><input type="number" class="item-rate" step="0.01" required></div>
-            <div class="form-group"><label>HSN:</label><input type="text" class="item-hsn" readonly></div>
-            <div class="form-group"><label>Unit:</label><input type="text" class="item-unit" readonly></div>
-            <div class="form-group"><label>GST %:</label><input type="text" class="item-gst" readonly></div>
+            <div class="form-group">
+              <label>Quantity:</label>
+              <input type="number" class="item-qty" required />
+            </div>
+            <div class="form-group">
+              <label>Rate:</label>
+              <input type="number" class="item-rate" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>HSN:</label>
+              <input type="text" class="item-hsn" readonly />
+            </div>
+            <div class="form-group">
+              <label>Unit:</label>
+              <input type="text" class="item-unit" readonly />
+            </div>
+            <div class="form-group">
+              <label>GST %:</label>
+              <input type="text" class="item-gst" readonly />
+            </div>
           </div>
         </div>
-        <button type="button" onclick="addProductFields()">Add Another Product</button>
+        <button type="button" onclick="addProductFields()">
+          Add Another Product
+        </button>
       </fieldset>
 
+      <!-- === Additional Charges === -->
       <fieldset>
         <legend>Additional Charges</legend>
-        <div class="form-group"><label for="freight">Freight Charges:</label><input type="number" id="freight"></div>
+        <div class="form-group">
+          <label for="freight">Freight Charges:</label>
+          <input type="number" id="freight" />
+        </div>
       </fieldset>
 
       <button type="submit">Generate Invoice</button>
     </form>
-    <button id="download-button" onclick="downloadPDF()" style="display: none;">Download PDF</button>
+
+    <!-- Download button stays hidden until Generate Invoice is clicked -->
+    <button id="download-button" onclick="downloadPDF()" style="display: none;">
+      Download PDF
+    </button>
   </div>
 
   <script>
-    document.getElementById('same-address').addEventListener('change', function () {
-      document.getElementById('shipping-details').style.display = this.checked ? 'none' : 'block';
+    // Toggle shipping address fields if "same as billing" is unchecked
+    document
+      .getElementById("same-address")
+      .addEventListener("change", function () {
+        document.getElementById("shipping-details").style.display = this.checked
+          ? "none"
+          : "block";
+      });
+
+    // After DOM loads, fetch products.json and populate all existing dropdowns
+    document.addEventListener("DOMContentLoaded", async () => {
+      const res = await fetch("products.json");
+      const data = await res.json();
+      window.productDetails = data;
+
+      // Function to populate a single <select> element with product options
+      function populateDropdown(dropdown) {
+        // Clear any existing options except the first "Select a product"
+        dropdown.innerHTML =
+          '<option value="" disabled selected>Select a product</option>';
+        data.forEach((p) => {
+          const option = document.createElement("option");
+          option.value = p.name;
+          option.textContent = `${p.name} (${p.unit})`;
+          dropdown.appendChild(option);
+        });
+        $(dropdown).select2({ width: "100%" }); // initialize select2
+      }
+
+      // Run populateDropdown for every current .product-dropdown
+      document.querySelectorAll(".product-dropdown").forEach((dropdown) => {
+        populateDropdown(dropdown);
+
+        // When a product is selected, auto-fill HSN, Unit, GST, Rate
+        dropdown.addEventListener("change", function () {
+          const selected = data.find((p) => p.name === this.value);
+          const wrapper = this.closest(".product-item");
+          wrapper.querySelector(".item-hsn").value = selected.hsn;
+          wrapper.querySelector(".item-unit").value = selected.unit;
+          wrapper.querySelector(".item-gst").value = selected.gstRate;
+          wrapper.querySelector(".item-rate").value = selected.price;
+        });
+      });
     });
 
+    // When “Add Another Product” is clicked:
     function addProductFields() {
-      const container = document.getElementById('product-container');
-      const block = container.firstElementChild.cloneNode(true);
-      block.querySelectorAll('input').forEach(input => input.value = '');
-      block.querySelector('select').selectedIndex = 0;
-      container.appendChild(block);
+      const container = document.getElementById("product-container");
+      const firstBlock = container.firstElementChild;
+      const newBlock = firstBlock.cloneNode(true);
+
+      // Clear all input values and reset dropdown
+      newBlock.querySelectorAll("input").forEach((input) => (input.value = ""));
+      const newSelect = newBlock.querySelector(".product-dropdown");
+      newSelect.selectedIndex = 0;
+
+      // Append new block to container, then re-run select2/populate on it
+      container.appendChild(newBlock);
+
+      // Populate its dropdown just like the original
+      const data = window.productDetails || [];
+      newSelect.innerHTML =
+        '<option value="" disabled selected>Select a product</option>';
+      data.forEach((p) => {
+        const option = document.createElement("option");
+        option.value = p.name;
+        option.textContent = `${p.name} (${p.unit})`;
+        newSelect.appendChild(option);
+      });
+      $(newSelect).select2({ width: "100%" });
+
+      // Attach change listener to auto-fill HSN, Unit, GST, Rate
+      newSelect.addEventListener("change", function () {
+        const selected = data.find((p) => p.name === this.value);
+        const wrapper = this.closest(".product-item");
+        wrapper.querySelector(".item-hsn").value = selected.hsn;
+        wrapper.querySelector(".item-unit").value = selected.unit;
+        wrapper.querySelector(".item-gst").value = selected.gstRate;
+        wrapper.querySelector(".item-rate").value = selected.price;
+      });
     }
 
+    // Prevent form submission from reloading page, show Download button
     async function generateInvoice(event) {
       event.preventDefault();
-      document.getElementById('download-button').style.display = 'block';
+      document.getElementById("download-button").style.display = "block";
     }
 
+    // Build and download the PDF when Download button is clicked
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      const invoiceNo = document.getElementById('invoice-number').value;
-      const invoiceDate = document.getElementById('invoice-date').value;
-      const vehicleNo = document.getElementById('vehicle-no').value;
-      const reverseCharge = document.getElementById('reverse-charge').value;
-      const challanNo = document.getElementById('challan-no').value;
-      const dateOfSupply = document.getElementById('date-of-supply').value;
-      const placeOfSupply = document.getElementById('place-of-supply').value;
-      const transporterName = document.getElementById('transporter-name').value;
-      const lrNumber = document.getElementById('lr-number').value;
+      // === Gather all form field values ===
+      const invoiceNo = document.getElementById("invoice-number").value;
+      const invoiceDate = document.getElementById("invoice-date").value;
+      const vehicleNo = document.getElementById("vehicle-no").value;
+      const reverseCharge = document.getElementById("reverse-charge").value;
+      const challanNo = document.getElementById("challan-no").value;
+      const dateOfSupply = document.getElementById("date-of-supply").value;
+      const placeOfSupply = document.getElementById("place-of-supply").value;
+      const transporterName = document.getElementById("transporter-name").value;
+      const lrNumber = document.getElementById("lr-number").value;
 
-      const customerName = document.getElementById('customer-name').value;
-      const customerEmail = document.getElementById('customer-email').value;
-      const customerPhone = document.getElementById('customer-phone').value;
-      const billingAddress = document.getElementById('billing-address').value;
+      const customerName = document.getElementById("customer-name").value;
+      const customerEmail = document.getElementById("customer-email").value;
+      const customerPhone = document.getElementById("customer-phone").value;
+      const billingAddress = document.getElementById("billing-address").value;
 
       let shippingName = customerName;
       let shippingEmail = customerEmail;
       let shippingPhone = customerPhone;
       let shippingAddress = billingAddress;
-      if (!document.getElementById('same-address').checked) {
-        shippingName = document.getElementById('shipping-name').value;
-        shippingEmail = document.getElementById('shipping-email').value;
-        shippingPhone = document.getElementById('shipping-phone').value;
-        shippingAddress = document.getElementById('shipping-address').value;
+      if (!document.getElementById("same-address").checked) {
+        shippingName = document.getElementById("shipping-name").value;
+        shippingEmail = document.getElementById("shipping-email").value;
+        shippingPhone = document.getElementById("shipping-phone").value;
+        shippingAddress = document.getElementById("shipping-address").value;
       }
 
+      // === Draw logo & header onto PDF ===
       const logo = new Image();
-      logo.src = '893e665f-85de-44ef-aeaf-99f25fa4fa4d.png';
+      logo.src = "893e665f-85de-44ef-aeaf-99f25fa4fa4d.png";
       logo.onload = () => {
-        doc.addImage(logo, 'PNG', 80, 4, 50, 20);
+        doc.addImage(logo, "PNG", 80, 4, 50, 20);
         doc.setFontSize(10);
         doc.text("TAX INVOICE", 85, 30);
         doc.text(`Invoice No: ${invoiceNo}`, 10, 38);
         doc.text(`Invoice Date: ${invoiceDate}`, 150, 38);
 
+        // === Optional fields line by line ===
         let y = 44;
         if (vehicleNo) doc.text(`Vehicle No: ${vehicleNo}`, 10, y);
         if (reverseCharge) doc.text(`Reverse Charge: ${reverseCharge}`, 150, y);
@@ -143,10 +312,12 @@
         if (dateOfSupply) doc.text(`Date of Supply: ${dateOfSupply}`, 150, y);
         y += 6;
         if (placeOfSupply) doc.text(`Place of Supply: ${placeOfSupply}`, 10, y);
-        if (transporterName) doc.text(`Transporter Name: ${transporterName}`, 150, y);
+        if (transporterName)
+          doc.text(`Transporter Name: ${transporterName}`, 150, y);
         y += 6;
         if (lrNumber) doc.text(`LR Number: ${lrNumber}`, 10, y);
 
+        // === Customer & Shipping ===
         y += 10;
         doc.text(`Billed To: ${customerName}`, 10, y);
         doc.text(`Email: ${customerEmail}`, 10, y + 6);
@@ -155,52 +326,105 @@
         doc.text(`Shipping To: ${shippingName}`, 10, y + 30);
         doc.text(`Shipping Address: ${shippingAddress}`, 10, y + 36);
 
-        const items = document.querySelectorAll('.product-item');
+        // === Build invoice items table ===
+        const items = document.querySelectorAll(".product-item");
         const rows = [];
         items.forEach((el, i) => {
-          const name = el.querySelector('.product-dropdown').value;
-          const qty = el.querySelector('.item-qty').value;
-          const rate = parseFloat(el.querySelector('.item-rate').value);
-          const hsn = el.querySelector('.item-hsn').value;
-          const unit = el.querySelector('.item-unit').value;
-          const gst = parseFloat(el.querySelector('.item-gst').value);
+          const name = el.querySelector(".product-dropdown").value;
+          const qty = el.querySelector(".item-qty").value;
+          const rate = parseFloat(el.querySelector(".item-rate").value);
+          const hsn = el.querySelector(".item-hsn").value;
+          const unit = el.querySelector(".item-unit").value;
+          const gst = parseFloat(el.querySelector(".item-gst").value);
           const taxable = (qty * rate).toFixed(2);
           const gstAmt = ((taxable * gst) / 100).toFixed(2);
           const total = (parseFloat(taxable) + parseFloat(gstAmt)).toFixed(2);
-          rows.push([i + 1, name, hsn, qty, unit, rate, taxable, gst + '%', gstAmt, total]);
+          rows.push([
+            i + 1,
+            name,
+            hsn,
+            qty,
+            unit,
+            rate,
+            taxable,
+            gst + "%",
+            gstAmt,
+            total,
+          ]);
         });
 
-        const freight = parseFloat(document.getElementById('freight').value) || 0;
+        // === Add freight row if nonzero ===
+        const freight = parseFloat(document.getElementById("freight").value) || 0;
         const freightGst = (freight * 0.18).toFixed(2);
         const freightTotal = (freight + parseFloat(freightGst)).toFixed(2);
         if (freight > 0) {
-          rows.push(['', 'Freight Charges', '', '', '', '', freight.toFixed(2), '18%', freightGst, freightTotal]);
+          rows.push([
+            "",
+            "Freight Charges",
+            "",
+            "",
+            "",
+            "",
+            freight.toFixed(2),
+            "18%",
+            freightGst,
+            freightTotal,
+          ]);
         }
 
+        // Insert table under Y + 50
         doc.autoTable({
           startY: y + 50,
-          head: [["Sr", "Name", "HSN", "Qty", "Unit", "Rate", "Taxable", "GST %", "GST Amt", "Total"]],
+          head: [
+            [
+              "Sr",
+              "Name",
+              "HSN",
+              "Qty",
+              "Unit",
+              "Rate",
+              "Taxable",
+              "GST %",
+              "GST Amt",
+              "Total",
+            ],
+          ],
           body: rows,
           styles: { fontSize: 8 },
-          headStyles: { fillColor: [22, 160, 133] }
+          headStyles: { fillColor: [22, 160, 133] },
         });
 
         const fy = doc.lastAutoTable.finalY + 10;
-        doc.text("Certified that the particulars given above are true and correct.", 10, fy);
+        doc.text(
+          "Certified that the particulars given above are true and correct.",
+          10,
+          fy
+        );
         doc.text("Authorised Signatory", 150, fy + 10);
 
+        // === Bank Details ===
         doc.text("Bank Details:", 10, fy + 20);
-        doc.text("Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.", 10, fy + 26);
+        doc.text(
+          "Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.",
+          10,
+          fy + 26
+        );
         doc.text("Bank Account Number: 10227953860", 10, fy + 32);
         doc.text("Bank IFSC Code: IDFB0041438", 10, fy + 38);
         doc.text("Bank Name: IDFC FIRST Bank", 10, fy + 44);
         doc.text("Bank Branch Name: CHAKAN BRANCH", 10, fy + 50);
 
+        // === Terms & Conditions ===
         doc.text("Terms and Conditions:", 10, fy + 60);
         doc.text("1. This is an electronically generated document.", 10, fy + 66);
         doc.text("2. All disputes are subject to Pune jurisdiction.", 10, fy + 72);
-        doc.text("3. Payment to be cleared within 0 days from invoice date.", 10, fy + 78);
+        doc.text(
+          "3. Payment to be cleared within 0 days from invoice date.",
+          10,
+          fy + 78
+        );
 
+        // Finally save
         doc.save("invoice.pdf");
       };
     }
