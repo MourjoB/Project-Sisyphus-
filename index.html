@@ -91,28 +91,119 @@
       container.appendChild(block);
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const res = await fetch('products.json');
-      const data = await res.json();
-      window.productDetails = data;
-      document.querySelectorAll('.product-dropdown').forEach(dropdown => {
-        data.forEach(p => {
-          const option = document.createElement('option');
-          option.value = p.name;
-          option.textContent = `${p.name} (${p.unit})`;
-          dropdown.appendChild(option);
+    async function generateInvoice(event) {
+      event.preventDefault();
+      document.getElementById('download-button').style.display = 'block';
+    }
+
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const invoiceNo = document.getElementById('invoice-number').value;
+      const invoiceDate = document.getElementById('invoice-date').value;
+      const vehicleNo = document.getElementById('vehicle-no').value;
+      const reverseCharge = document.getElementById('reverse-charge').value;
+      const challanNo = document.getElementById('challan-no').value;
+      const dateOfSupply = document.getElementById('date-of-supply').value;
+      const placeOfSupply = document.getElementById('place-of-supply').value;
+      const transporterName = document.getElementById('transporter-name').value;
+      const lrNumber = document.getElementById('lr-number').value;
+
+      const customerName = document.getElementById('customer-name').value;
+      const customerEmail = document.getElementById('customer-email').value;
+      const customerPhone = document.getElementById('customer-phone').value;
+      const billingAddress = document.getElementById('billing-address').value;
+
+      let shippingName = customerName;
+      let shippingEmail = customerEmail;
+      let shippingPhone = customerPhone;
+      let shippingAddress = billingAddress;
+      if (!document.getElementById('same-address').checked) {
+        shippingName = document.getElementById('shipping-name').value;
+        shippingEmail = document.getElementById('shipping-email').value;
+        shippingPhone = document.getElementById('shipping-phone').value;
+        shippingAddress = document.getElementById('shipping-address').value;
+      }
+
+      const logo = new Image();
+      logo.src = '893e665f-85de-44ef-aeaf-99f25fa4fa4d.png';
+      logo.onload = () => {
+        doc.addImage(logo, 'PNG', 80, 4, 50, 20);
+        doc.setFontSize(10);
+        doc.text("TAX INVOICE", 85, 30);
+        doc.text(`Invoice No: ${invoiceNo}`, 10, 38);
+        doc.text(`Invoice Date: ${invoiceDate}`, 150, 38);
+
+        let y = 44;
+        if (vehicleNo) doc.text(`Vehicle No: ${vehicleNo}`, 10, y);
+        if (reverseCharge) doc.text(`Reverse Charge: ${reverseCharge}`, 150, y);
+        y += 6;
+        if (challanNo) doc.text(`Challan No: ${challanNo}`, 10, y);
+        if (dateOfSupply) doc.text(`Date of Supply: ${dateOfSupply}`, 150, y);
+        y += 6;
+        if (placeOfSupply) doc.text(`Place of Supply: ${placeOfSupply}`, 10, y);
+        if (transporterName) doc.text(`Transporter Name: ${transporterName}`, 150, y);
+        y += 6;
+        if (lrNumber) doc.text(`LR Number: ${lrNumber}`, 10, y);
+
+        y += 10;
+        doc.text(`Billed To: ${customerName}`, 10, y);
+        doc.text(`Email: ${customerEmail}`, 10, y + 6);
+        doc.text(`Phone: ${customerPhone}`, 10, y + 12);
+        doc.text(`Billing Address: ${billingAddress}`, 10, y + 18);
+        doc.text(`Shipping To: ${shippingName}`, 10, y + 30);
+        doc.text(`Shipping Address: ${shippingAddress}`, 10, y + 36);
+
+        const items = document.querySelectorAll('.product-item');
+        const rows = [];
+        items.forEach((el, i) => {
+          const name = el.querySelector('.product-dropdown').value;
+          const qty = el.querySelector('.item-qty').value;
+          const rate = parseFloat(el.querySelector('.item-rate').value);
+          const hsn = el.querySelector('.item-hsn').value;
+          const unit = el.querySelector('.item-unit').value;
+          const gst = parseFloat(el.querySelector('.item-gst').value);
+          const taxable = (qty * rate).toFixed(2);
+          const gstAmt = ((taxable * gst) / 100).toFixed(2);
+          const total = (parseFloat(taxable) + parseFloat(gstAmt)).toFixed(2);
+          rows.push([i + 1, name, hsn, qty, unit, rate, taxable, gst + '%', gstAmt, total]);
         });
-        $(dropdown).select2();
-        dropdown.addEventListener('change', function () {
-          const selected = data.find(p => p.name === this.value);
-          const wrapper = this.closest('.product-item');
-          wrapper.querySelector('.item-hsn').value = selected.hsn;
-          wrapper.querySelector('.item-unit').value = selected.unit;
-          wrapper.querySelector('.item-gst').value = selected.gstRate;
-          wrapper.querySelector('.item-rate').value = selected.price;
+
+        const freight = parseFloat(document.getElementById('freight').value) || 0;
+        const freightGst = (freight * 0.18).toFixed(2);
+        const freightTotal = (freight + parseFloat(freightGst)).toFixed(2);
+        if (freight > 0) {
+          rows.push(['', 'Freight Charges', '', '', '', '', freight.toFixed(2), '18%', freightGst, freightTotal]);
+        }
+
+        doc.autoTable({
+          startY: y + 50,
+          head: [["Sr", "Name", "HSN", "Qty", "Unit", "Rate", "Taxable", "GST %", "GST Amt", "Total"]],
+          body: rows,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [22, 160, 133] }
         });
-      });
-    });
+
+        const fy = doc.lastAutoTable.finalY + 10;
+        doc.text("Certified that the particulars given above are true and correct.", 10, fy);
+        doc.text("Authorised Signatory", 150, fy + 10);
+
+        doc.text("Bank Details:", 10, fy + 20);
+        doc.text("Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.", 10, fy + 26);
+        doc.text("Bank Account Number: 10227953860", 10, fy + 32);
+        doc.text("Bank IFSC Code: IDFB0041438", 10, fy + 38);
+        doc.text("Bank Name: IDFC FIRST Bank", 10, fy + 44);
+        doc.text("Bank Branch Name: CHAKAN BRANCH", 10, fy + 50);
+
+        doc.text("Terms and Conditions:", 10, fy + 60);
+        doc.text("1. This is an electronically generated document.", 10, fy + 66);
+        doc.text("2. All disputes are subject to Pune jurisdiction.", 10, fy + 72);
+        doc.text("3. Payment to be cleared within 0 days from invoice date.", 10, fy + 78);
+
+        doc.save("invoice.pdf");
+      };
+    }
   </script>
 </body>
 </html>
