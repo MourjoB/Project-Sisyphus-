@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prototype-1</title>
+    <meta name="viewport" content="width=1024">
+    <title>Invoice Generator - PDF Text Version</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <h1>Automatic Invoice Maker</h1>
@@ -17,40 +17,48 @@
             <legend>Invoice Details</legend>
             <div class="form-group">
                 <label for="invoice-number">Invoice Number:</label>
-                <input type="text" id="invoice-number" name="invoice-number" required>
+                <input type="text" id="invoice-number" required>
             </div>
         </fieldset>
         <fieldset>
             <legend>Customer Details</legend>
             <div class="form-group">
-                <label for="customer-name">Name:</label>
-                <input type="text" id="customer-name" name="customer-name" required>
+                <label for="customer-name">Customer Name:</label>
+                <input type="text" id="customer-name" required>
             </div>
             <div class="form-group">
                 <label for="customer-email">Email:</label>
-                <input type="email" id="customer-email" name="customer-email" required>
+                <input type="email" id="customer-email">
             </div>
             <div class="form-group">
                 <label for="customer-phone">Phone:</label>
-                <input type="tel" id="customer-phone" name="customer-phone">
+                <input type="tel" id="customer-phone">
             </div>
             <div class="form-group">
                 <label for="billing-address">Billing Address:</label>
-                <input type="text" id="billing-address" name="billing-address" required>
+                <input type="text" id="billing-address" required>
             </div>
             <div class="form-group">
-                <input type="checkbox" id="same-address" name="same-address" checked>
-                <label for="same-address">Shipping Address same as Billing Address</label>
+                <input type="checkbox" id="same-address" checked>
+                <label for="same-address">Shipping address same as billing</label>
             </div>
-            <div class="form-group" id="shipping-details-group" style="display: none;">
-                <label for="shipping-name">Shipping Name:</label>
-                <input type="text" id="shipping-name" name="shipping-name">
-                <label for="shipping-email">Shipping Email:</label>
-                <input type="email" id="shipping-email" name="shipping-email">
-                <label for="shipping-phone">Shipping Phone:</label>
-                <input type="tel" id="shipping-phone" name="shipping-phone">
-                <label for="shipping-address">Shipping Address:</label>
-                <input type="text" id="shipping-address" name="shipping-address">
+            <div id="shipping-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="shipping-name">Shipping Name:</label>
+                    <input type="text" id="shipping-name">
+                </div>
+                <div class="form-group">
+                    <label for="shipping-email">Shipping Email:</label>
+                    <input type="email" id="shipping-email">
+                </div>
+                <div class="form-group">
+                    <label for="shipping-phone">Shipping Phone:</label>
+                    <input type="tel" id="shipping-phone">
+                </div>
+                <div class="form-group">
+                    <label for="shipping-address">Shipping Address:</label>
+                    <input type="text" id="shipping-address">
+                </div>
             </div>
         </fieldset>
         <fieldset>
@@ -58,21 +66,15 @@
             <div id="product-container">
                 <div class="product-item">
                     <div class="form-group">
-                        <label for="item-name">Item Name:</label>
-                        <select name="item-name[]" class="product-dropdown" required>
-                            <option value="" disabled selected>Select a product</option>
-                            <option value="Instant Coffee (SD)">Instant Coffee (SD)</option>
-                            <option value="Instant Coffee (Agglo)">Instant Coffee (Agglo)</option>
-                            <option value="Instant Coffee (FD)">Instant Coffee (FD)</option>
-                            <option value="Coffee Premix">Coffee Premix</option>
-                        </select>
+                        <label>Item Name:</label>
+                        <select name="item-name[]" class="product-dropdown" required></select>
                     </div>
                     <div class="form-group">
-                        <label for="item-quantity">Quantity:</label>
+                        <label>Quantity:</label>
                         <input type="number" name="item-quantity[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="item-price">Price:</label>
+                        <label>Price:</label>
                         <input type="number" name="item-price[]" step="0.01" required>
                     </div>
                 </div>
@@ -83,54 +85,58 @@
             <legend>Additional Charges</legend>
             <div class="form-group">
                 <label for="freight-charges">Freight Charges:</label>
-                <input type="number" id="freight-charges" name="freight-charges" step="0.01">
+                <input type="number" id="freight-charges" step="0.01">
             </div>
         </fieldset>
         <button type="submit">Generate Invoice</button>
     </form>
-    <div id="invoice-container"></div>
     <button id="download-button" onclick="downloadPDF()">Download PDF</button>
+
     <script>
         function addProductFields() {
             const container = document.getElementById('product-container');
             const productFields = `
                 <div class="product-item">
                     <div class="form-group">
-                        <label for="item-name">Item Name:</label>
-                        <select name="item-name[]" class="product-dropdown" required>
-                            <option value="" disabled selected>Select a product</option>
-                            ${window.productDetails.map(product => `<option value="${product.name}">${product.name} (${product.unit})</option>`).join('')}
-                        </select>
+                        <label>Item Name:</label>
+                        <select name="item-name[]" class="product-dropdown" required></select>
                     </div>
                     <div class="form-group">
-                        <label for="item-quantity">Quantity:</label>
+                        <label>Quantity:</label>
                         <input type="number" name="item-quantity[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="item-price">Price:</label>
+                        <label>Price:</label>
                         <input type="number" name="item-price[]" step="0.01" required>
                     </div>
-                </div>
-            `;
+                </div>`;
             container.insertAdjacentHTML('beforeend', productFields);
+            populateDropdowns();
+        }
+
+        function populateDropdowns() {
+            const selects = document.querySelectorAll('.product-dropdown');
+            selects.forEach(select => {
+                if (select.options.length <= 1) {
+                    select.innerHTML = '<option value="" disabled selected>Select a product</option>' +
+                        window.productDetails.map(p => `<option value="${p.name}">${p.name} (${p.unit})</option>`).join('');
+                }
+            });
             $('.product-dropdown').select2();
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('products.json'); // Fetch the JSON file
-                const products = await response.json(); // Parse the JSON data
-                window.productDetails = products;
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
+        document.getElementById('same-address').addEventListener('change', function () {
+            document.getElementById('shipping-fields').style.display = this.checked ? 'none' : 'block';
         });
 
         async function generateInvoice(event) {
             event.preventDefault();
+            document.getElementById('download-button').style.display = 'block';
+        }
 
-            const invoiceNumber = document.getElementById('invoice-number').value;
-            const invoiceDate = new Date().toLocaleDateString();
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
             const customerName = document.getElementById('customer-name').value;
             const customerEmail = document.getElementById('customer-email').value;
@@ -149,181 +155,82 @@
                 shippingAddress = document.getElementById('shipping-address').value;
             }
 
-            const freightCharges = parseFloat(document.getElementById('freight-charges').value) || 0;
+            doc.setFontSize(14);
+            doc.text("Purple Bean Agro Industries Pvt. Ltd.", 10, 10);
+            doc.setFontSize(10);
+            doc.text("PBAI Pvt Ltd, nr. Dapodi Metro Station, Dapodi, Pune, Maharashtra 411012", 10, 16);
+            doc.text("Phone: 8101287339 | Email: purplebeanagro@gmail.com", 10, 22);
+            doc.text("GST: 27AIPPD4664G1Z2 | PAN: AAPCP3820M", 10, 28);
 
-            const productContainer = document.getElementById('product-container');
-            const productItems = productContainer.querySelectorAll('.product-item');
+            doc.setFontSize(12);
+            doc.text("TAX INVOICE", 85, 38);
 
-            let totalQty = 0, totalTaxableValue = 0, totalGstAmount = 0, totalAmount = 0;
+            doc.setFontSize(10);
+            doc.text(`Invoice Number: ${document.getElementById('invoice-number').value}`, 10, 48);
+            doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 150, 48);
 
-            let invoiceHTML = `
-                <h2>Purple Bean Agro Industries Pvt. Ltd.</h2>
-                <p>PBAI Pvt Ltd, nr. Dapodi Metro Station, Dapodi, Pune, Pimpri-Chinchwad, Maharashtra 411012</p>
-                <p>Phone: 8101287339 | Email: purplebeanagro@gmail.com</p>
-                <p>GST: 27AIPPD4664G1Z2 | PAN: AAPCP3820M</p>
-                <h2>TAX INVOICE</h2>
-                <p><strong>Invoice Number:</strong> ${invoiceNumber}</p>
-                <p><strong>Invoice Date:</strong> ${invoiceDate}</p>
-                <div class="details">
-                    <div>
-                        <h3>Details of Receiver (Billing Address)</h3>
-                        <p><strong>Name:</strong> ${customerName}</p>
-                        <p><strong>Email:</strong> ${customerEmail}</p>
-                        <p><strong>Phone:</strong> ${customerPhone}</p>
-                        <p><strong>Address:</strong> ${billingAddress}</p>
-                    </div>
-                    <div>
-                        <h3>Details of Consignee (Shipping Address)</h3>
-                        <p><strong>Name:</strong> ${shippingName}</p>
-                        <p><strong>Email:</strong> ${shippingEmail}</p>
-                        <p><strong>Phone:</strong> ${shippingPhone}</p>
-                        <p><strong>Address:</strong> ${shippingAddress}</p>
-                    </div>
-                </div>
-                <div class="invoice-table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Sr. No</th>
-                            <th>Name of Product</th>
-                            <th>HSN/SAC</th>
-                            <th>QTY</th>
-                            <th>Unit</th>
-                            <th>Rate</th>
-                            <th>Taxable Value</th>
-                            <th>GST Rate</th>
-                            <th>GST Amount</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            doc.text(`Billing Name: ${customerName}`, 10, 56);
+            doc.text(`Email: ${customerEmail}`, 10, 61);
+            doc.text(`Phone: ${customerPhone}`, 10, 66);
+            doc.text(`Billing Address: ${billingAddress}`, 10, 71);
+
+            doc.text(`Shipping Name: ${shippingName}`, 10, 80);
+            doc.text(`Email: ${shippingEmail}`, 10, 85);
+            doc.text(`Phone: ${shippingPhone}`, 10, 90);
+            doc.text(`Shipping Address: ${shippingAddress}`, 10, 95);
+
+            const productItems = document.querySelectorAll('.product-item');
+            const rows = [];
 
             productItems.forEach((item, index) => {
-                const itemName = item.querySelector('[name="item-name[]"]').value;
-                const itemQuantity = parseFloat(item.querySelector('[name="item-quantity[]"]').value);
+                const name = item.querySelector('[name="item-name[]"]').value;
+                const qty = item.querySelector('[name="item-quantity[]"]').value;
+                const price = item.querySelector('[name="item-price[]"]').value;
+                const product = window.productDetails.find(p => p.name === name);
 
-                const product = window.productDetails.find(p => p.name === itemName);
-                const hsn = product.hsn;
-                const gstRate = product.gstRate;
                 const unit = product.unit;
-                const itemPrice = product.price;
+                const hsn = product.hsn;
+                const gst = product.gstRate;
+                const taxable = (qty * price).toFixed(2);
+                const gstAmt = ((taxable * gst) / 100).toFixed(2);
+                const total = (parseFloat(taxable) + parseFloat(gstAmt)).toFixed(2);
 
-                const taxableValue = (itemQuantity * itemPrice).toFixed(2);
-                const gstAmount = ((taxableValue * gstRate) / 100).toFixed(2);
-                const total = (parseFloat(taxableValue) + parseFloat(gstAmount)).toFixed(2);
-
-                totalQty += itemQuantity;
-                totalTaxableValue += parseFloat(taxableValue);
-                totalGstAmount += parseFloat(gstAmount);
-                totalAmount += parseFloat(total);
-
-                invoiceHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${itemName}</td>
-                        <td>${hsn}</td>
-                        <td>${itemQuantity}</td>
-                        <td>${unit}</td>
-                        <td>${itemPrice}</td>
-                        <td>${taxableValue}</td>
-                        <td>${gstRate}%</td>
-                        <td>${gstAmount}</td>
-                        <td>${total}</td>
-                    </tr>
-                `;
+                rows.push([index + 1, name, hsn, qty, unit, price, taxable, `${gst}%`, gstAmt, total]);
             });
 
-            const freightGstAmount = ((freightCharges * 18) / 100).toFixed(2);
-            const freightTotal = (freightCharges + parseFloat(freightGstAmount)).toFixed(2);
+            const freight = parseFloat(document.getElementById('freight-charges').value) || 0;
+            if (freight > 0) {
+                const gstAmt = (freight * 0.18).toFixed(2);
+                const total = (freight + parseFloat(gstAmt)).toFixed(2);
+                rows.push(['', 'Freight Charges', '', '', '', '', freight.toFixed(2), '18%', gstAmt, total]);
+            }
 
-            totalTaxableValue += freightCharges;
-            totalGstAmount += parseFloat(freightGstAmount);
-            totalAmount += parseFloat(freightTotal);
-
-            invoiceHTML += `
-                    <tr>
-                        <td colspan="6"><strong>Freight Charges</strong></td>
-                        <td>${freightCharges.toFixed(2)}</td>
-                        <td>18%</td>
-                        <td>${freightGstAmount}</td>
-                        <td>${freightTotal}</td>
-                    </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3"><strong>Total</strong></td>
-                            <td><strong>${totalQty}</strong></td>
-                            <td></td>
-                            <td></td>
-                            <td><strong>${totalTaxableValue.toFixed(2)}</strong></td>
-                            <td></td>
-                            <td><strong>${totalGstAmount.toFixed(2)}</strong></td>
-                            <td><strong>${totalAmount.toFixed(2)}</strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                </div> 
-                <p><strong>Bank Details:</strong></p>
-                <p>Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.</p>
-                <p>Bank Account Number: 10227953860</p>
-                <p>Bank IFSC Code: IDFB0041438</p>
-                <p>Bank Name: IDFC FIRST Bank</p>
-                <p>Bank Branch Name: CHAKAN BRANCH</p>
-            `;
-
-            const invoiceContainer = document.getElementById('invoice-container');
-            invoiceContainer.innerHTML = invoiceHTML;
-
-            const downloadButton = document.getElementById('download-button');
-            downloadButton.style.display = 'block';
-        }
-
-        function downloadPDF() {
-            const invoiceContainer = document.getElementById('invoice-container');
-            const { jsPDF } = window.jspdf;
-
-            html2canvas(invoiceContainer, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4' // Set page size to A4
-                });
-
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const imgWidth = pageWidth - 20; // Leave margins
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-
-                // Handle multi-page content
-                if (imgHeight > pageHeight - 20) {
-                    const remainingHeight = imgHeight - (pageHeight - 20);
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 10, -remainingHeight, imgWidth, imgHeight);
-                }
-
-                // Create a Blob for the PDF file
-                const pdfBlob = doc.output('blob');
-                const blobURL = URL.createObjectURL(pdfBlob);
-
-                // Create a temporary link for downloading
-                const link = document.createElement('a');
-                link.href = blobURL;
-                link.download = 'invoice.pdf';
-                link.style.display = 'none';
-
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            doc.autoTable({
+                startY: 105,
+                head: [[
+                    'Sr. No', 'Name of Product', 'HSN/SAC', 'QTY', 'Unit', 'Rate',
+                    'Taxable Value', 'GST Rate', 'GST Amount', 'Total'
+                ]],
+                body: rows,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [0, 123, 255] }
             });
+
+            doc.text("Bank Details:", 10, doc.lastAutoTable.finalY + 10);
+            doc.text("Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.", 10, doc.lastAutoTable.finalY + 16);
+            doc.text("Bank Account Number: 10227953860", 10, doc.lastAutoTable.finalY + 22);
+            doc.text("Bank IFSC Code: IDFB0041438", 10, doc.lastAutoTable.finalY + 28);
+            doc.text("Bank Name: IDFC FIRST Bank", 10, doc.lastAutoTable.finalY + 34);
+            doc.text("Bank Branch Name: CHAKAN BRANCH", 10, doc.lastAutoTable.finalY + 40);
+
+            doc.save("invoice.pdf");
         }
 
-        document.getElementById('same-address').addEventListener('change', function () {
-            const shippingDetailsGroup = document.getElementById('shipping-details-group');
-            shippingDetailsGroup.style.display = this.checked ? 'none' : 'block';
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('products.json');
+            const products = await response.json();
+            window.productDetails = products;
+            populateDropdowns();
         });
     </script>
 </body>
