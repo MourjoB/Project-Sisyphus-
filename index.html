@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024">
-    <title>Invoice Generator - PDF Text Version</title>
+    <title>Invoice Generator - Reference Format</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -18,6 +18,10 @@
             <div class="form-group">
                 <label for="invoice-number">Invoice Number:</label>
                 <input type="text" id="invoice-number" required>
+            </div>
+            <div class="form-group">
+                <label for="invoice-date">Invoice Date:</label>
+                <input type="date" id="invoice-date" required>
             </div>
         </fieldset>
         <fieldset>
@@ -93,6 +97,10 @@
     <button id="download-button" onclick="downloadPDF()">Download PDF</button>
 
     <script>
+        document.getElementById('same-address').addEventListener('change', function () {
+            document.getElementById('shipping-fields').style.display = this.checked ? 'none' : 'block';
+        });
+
         function addProductFields() {
             const container = document.getElementById('product-container');
             const productFields = `
@@ -125,10 +133,6 @@
             $('.product-dropdown').select2();
         }
 
-        document.getElementById('same-address').addEventListener('change', function () {
-            document.getElementById('shipping-fields').style.display = this.checked ? 'none' : 'block';
-        });
-
         async function generateInvoice(event) {
             event.preventDefault();
             document.getElementById('download-button').style.display = 'block';
@@ -138,6 +142,8 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            const invoiceNo = document.getElementById('invoice-number').value;
+            const invoiceDate = document.getElementById('invoice-date').value || new Date().toLocaleDateString();
             const customerName = document.getElementById('customer-name').value;
             const customerEmail = document.getElementById('customer-email').value;
             const customerPhone = document.getElementById('customer-phone').value;
@@ -155,73 +161,91 @@
                 shippingAddress = document.getElementById('shipping-address').value;
             }
 
+            // Header
             doc.setFontSize(14);
-            doc.text("Purple Bean Agro Industries Pvt. Ltd.", 10, 10);
+            doc.text("SHREE UTSAV FOODS AND BEVERAGES", 10, 10);
             doc.setFontSize(10);
-            doc.text("PBAI Pvt Ltd, nr. Dapodi Metro Station, Dapodi, Pune, Maharashtra 411012", 10, 16);
-            doc.text("Phone: 8101287339 | Email: purplebeanagro@gmail.com", 10, 22);
-            doc.text("GST: 27AIPPD4664G1Z2 | PAN: AAPCP3820M", 10, 28);
+            doc.text("34/2/3/4, Vijay Nagar, Navecha Road, Pimple Gurav, Pune, Maharashtra - 411061", 10, 16);
+            doc.text("9309359125 | shreeutsavfnb@gmail.com", 10, 22);
+            doc.text("GSTIN : 27AIPPD4664G1Z2 | PAN : AIPPD4664G", 10, 28);
 
             doc.setFontSize(12);
-            doc.text("TAX INVOICE", 85, 38);
-
+            doc.text("TAX INVOICE", 85, 36);
             doc.setFontSize(10);
-            doc.text(`Invoice Number: ${document.getElementById('invoice-number').value}`, 10, 48);
-            doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 150, 48);
+            doc.text("Original for Recipient", 10, 42);
+            doc.text("Invoice No.: " + invoiceNo, 10, 48);
+            doc.text("Invoice Date: " + invoiceDate, 150, 48);
 
-            doc.text(`Billing Name: ${customerName}`, 10, 56);
-            doc.text(`Email: ${customerEmail}`, 10, 61);
-            doc.text(`Phone: ${customerPhone}`, 10, 66);
-            doc.text(`Billing Address: ${billingAddress}`, 10, 71);
+            doc.text("Details of Receiver:", 10, 56);
+            doc.text(customerName, 10, 61);
+            doc.text(billingAddress, 10, 66);
+            doc.text(customerPhone, 10, 71);
+            doc.text("GSTIN: ____________", 10, 76);
 
-            doc.text(`Shipping Name: ${shippingName}`, 10, 80);
-            doc.text(`Email: ${shippingEmail}`, 10, 85);
-            doc.text(`Phone: ${shippingPhone}`, 10, 90);
-            doc.text(`Shipping Address: ${shippingAddress}`, 10, 95);
+            doc.text("Details of Consignee:", 110, 56);
+            doc.text(shippingName, 110, 61);
+            doc.text(shippingAddress, 110, 66);
+            doc.text(shippingPhone, 110, 71);
+            doc.text("GSTIN: ____________", 110, 76);
 
             const productItems = document.querySelectorAll('.product-item');
             const rows = [];
+            let totalQty = 0;
+            let totalTaxable = 0;
+            let totalGst = 0;
+            let total = 0;
 
             productItems.forEach((item, index) => {
                 const name = item.querySelector('[name="item-name[]"]').value;
-                const qty = item.querySelector('[name="item-quantity[]"]').value;
-                const price = item.querySelector('[name="item-price[]"]').value;
+                const qty = parseFloat(item.querySelector('[name="item-quantity[]"]').value);
+                const price = parseFloat(item.querySelector('[name="item-price[]"]').value);
                 const product = window.productDetails.find(p => p.name === name);
 
                 const unit = product.unit;
                 const hsn = product.hsn;
                 const gst = product.gstRate;
-                const taxable = (qty * price).toFixed(2);
-                const gstAmt = ((taxable * gst) / 100).toFixed(2);
-                const total = (parseFloat(taxable) + parseFloat(gstAmt)).toFixed(2);
+                const taxable = (qty * price);
+                const gstAmt = taxable * gst / 100;
+                const totalRow = taxable + gstAmt;
 
-                rows.push([index + 1, name, hsn, qty, unit, price, taxable, `${gst}%`, gstAmt, total]);
+                rows.push([index + 1, name, hsn, qty, unit, price.toFixed(2), taxable.toFixed(2), `${gst}%`, gstAmt.toFixed(2), totalRow.toFixed(2)]);
+
+                totalQty += qty;
+                totalTaxable += taxable;
+                totalGst += gstAmt;
+                total += totalRow;
             });
 
             const freight = parseFloat(document.getElementById('freight-charges').value) || 0;
             if (freight > 0) {
-                const gstAmt = (freight * 0.18).toFixed(2);
-                const total = (freight + parseFloat(gstAmt)).toFixed(2);
-                rows.push(['', 'Freight Charges', '', '', '', '', freight.toFixed(2), '18%', gstAmt, total]);
+                const gstAmt = freight * 0.18;
+                const totalRow = freight + gstAmt;
+                rows.push(['', 'Freight Charges', '', '', '', '', freight.toFixed(2), '18%', gstAmt.toFixed(2), totalRow.toFixed(2)]);
+                totalTaxable += freight;
+                totalGst += gstAmt;
+                total += totalRow;
             }
 
             doc.autoTable({
-                startY: 105,
+                startY: 82,
                 head: [[
                     'Sr. No', 'Name of Product', 'HSN/SAC', 'QTY', 'Unit', 'Rate',
-                    'Taxable Value', 'GST Rate', 'GST Amount', 'Total'
+                    'Taxable Value', 'IGST Rate', 'IGST Amount', 'Total'
                 ]],
                 body: rows,
                 styles: { fontSize: 8 },
                 headStyles: { fillColor: [0, 123, 255] }
             });
 
-            doc.text("Bank Details:", 10, doc.lastAutoTable.finalY + 10);
-            doc.text("Acc Holder Name: Purple Bean Agro Industries Pvt. Ltd.", 10, doc.lastAutoTable.finalY + 16);
-            doc.text("Bank Account Number: 10227953860", 10, doc.lastAutoTable.finalY + 22);
-            doc.text("Bank IFSC Code: IDFB0041438", 10, doc.lastAutoTable.finalY + 28);
-            doc.text("Bank Name: IDFC FIRST Bank", 10, doc.lastAutoTable.finalY + 34);
-            doc.text("Bank Branch Name: CHAKAN BRANCH", 10, doc.lastAutoTable.finalY + 40);
+            const finalY = doc.lastAutoTable.finalY;
+            doc.text(`Total Quantity: ${totalQty}`, 10, finalY + 10);
+            doc.text(`Total Amount Before Tax: ₹${totalTaxable.toFixed(2)}`, 10, finalY + 16);
+            doc.text(`IGST: ₹${totalGst.toFixed(2)}`, 10, finalY + 22);
+            doc.text(`Amount With Tax: ₹${total.toFixed(2)}`, 10, finalY + 28);
+
+            doc.text("Certified that the particulars given above are true and correct", 10, finalY + 36);
+            doc.text("For, SHREE UTSAV FOODS AND BEVERAGES", 10, finalY + 42);
+            doc.text("Authorised Signatory", 10, finalY + 48);
 
             doc.save("invoice.pdf");
         }
