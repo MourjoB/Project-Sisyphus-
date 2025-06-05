@@ -59,14 +59,14 @@ button:hover {
 
 #invoice-container {
     width: 100%;
-    max-width: 800px; /* Limit the width for better rendering */
-    margin: 0 auto; /* Center the container */
+    max-width: 800px;
+    margin: 0 auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-family: 'Roboto', Arial, sans-serif;
-    overflow-x: auto; /* Prevent content from being cut off */
+    overflow-x: auto;
 }
 
 #invoice-container h2 {
@@ -85,6 +85,7 @@ button:hover {
     padding: 10px;
     border-radius: 8px;
     background-color: #f9f9f9;
+    gap: 10px;
 }
 
 #invoice-container .details div {
@@ -99,16 +100,21 @@ button:hover {
     font-weight: bold;
 }
 
+.invoice-table-wrapper {
+    overflow-x: auto;
+}
+
 #invoice-container table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    min-width: 900px;
 }
 
 #invoice-container th, #invoice-container td {
     padding: 10px;
     text-align: center;
-    font-size: 0.9em; /* Adjust font size for smaller screens */
+    font-size: 0.9em;
 }
 
 #invoice-container th {
@@ -119,9 +125,7 @@ button:hover {
 
 #invoice-container td {
     border: 1px solid #ccc;
-    padding: 10px;
     text-align: center;
-    font-size: 0.9em;
 }
 
 #invoice-container tfoot td {
@@ -131,7 +135,7 @@ button:hover {
 
 #download-button {
     display: none;
-    margin-top: 20px;
+    margin: 20px auto;
     padding: 10px 20px;
     background-color: #007BFF;
     color: #fff;
@@ -142,6 +146,45 @@ button:hover {
     font-weight: bold;
 }
 
-#download-button:hover {
-    background-color: #0056b3;
+/* 📱 Mobile Responsiveness */
+@media (max-width: 600px) {
+    html {
+        font-size: 90%;
+    }
+
+    #invoice-container h2 {
+        font-size: 1.3em;
+    }
+
+    #invoice-container .details {
+        flex-direction: column;
+    }
+
+    #invoice-container .details div {
+        width: 100%;
+    }
+
+    #invoice-container table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    #invoice-container th, #invoice-container td {
+        font-size: 0.8em;
+        padding: 6px;
+    }
+
+    form, #invoice-container {
+        padding: 10px;
+    }
+
+    button, input, select {
+        font-size: 0.9em;
+    }
+
+    #download-button {
+        width: 90%;
+        margin: 20px auto;
+    }
 }
